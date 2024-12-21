@@ -1,0 +1,24 @@
+version: '3.6'
+
+services:
+  app:
+    build: .
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    depends_on: 
+      - db
+  db:
+    image: mongo:latest
+    environment:
+      MONGO_USER: yourMongoUser
+      MONGO_PASSWORD: yourMongoPwd
+      MONGO_DB: yourMongoDB
+      MONGO_HOST: yourMongoHost
+    ports:
+      - 27017:27017
+    volumes:
+      - db-data:/var/lib/mongo/data
+volumes:
+  db-data:
