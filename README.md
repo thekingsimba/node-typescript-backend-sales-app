@@ -1,10 +1,7 @@
 # node-typescript-backend-sales-app
 
-# Sales App Backend
-
 Welcome to the Sales App Backend! Node.js backend built using modern development practices to power a feature-rich sales application. The backend is designed to handle sales process.
 
----
 
 ## 🚀 Features
 
@@ -31,8 +28,6 @@ Welcome to the Sales App Backend! Node.js backend built using modern development
 - **Testing**: Jest
 - **Documentation**: Swagger UI
 - **Others**: TypeScript, Winston for logging
-
----
 
 ## 📂 Project Structure
 
