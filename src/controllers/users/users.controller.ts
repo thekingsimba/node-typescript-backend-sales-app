@@ -9,10 +9,10 @@ import { IAddress, IUserCreate } from "./user.interface";
 import key from "../../config/key";
 import { paginated_data, pagination } from "../../middleware/pagination";
 import { sendSMS, sms_code } from "../../utils/sms";
-import { Role } from "../../controllers/role/role.schema";
+import { Role } from "../role/role.schema";
 import Logger from "../../utils/logger";
 import { last_day_of_month } from "../../utils/util";
-import { Order } from "../../controllers/order/order.schema";
+import { Order } from "../order/order.schema";
 import { last_year_data } from "../../utils/chart";
 import { fetch } from "utils/fetch";
 
@@ -28,10 +28,10 @@ export const social_auth = async (req: Request, res: Response) => {
     let userExists = await User.findOne({ email: data.email, firebase_token: data.firebase_token });
     if (!userExists) {
       const code = sms_code();
-      let user = new User({ 
-        full_name: data.full_name, 
+      let user = new User({
+        full_name: data.full_name,
         email: data.email,
-        phone: data.phone, 
+        phone: data.phone,
         picture: data.picture,
         verification_code: code,
         otp_expires: moment(new Date()).add(5, "minutes"),
@@ -54,20 +54,24 @@ export const social_auth = async (req: Request, res: Response) => {
       user = await user.save();
       const { full_name, phone, email, _id, picture, role, stripe_id } = user;
       const token = jwt.sign({ _id, email, full_name, role }, key.SECRET, { expiresIn: "30d" });
-      res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000)});
-      return res.header("authorization", `Bearer ${token}`).json(success("Login success!", { 
-        token, expires_at, user: { full_name, email, _id, phone, picture, role, stripe_id,
-      }}, res.statusCode));
+      res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000) });
+      return res.header("authorization", `Bearer ${token}`).json(success("Login success!", {
+        token, expires_at, user: {
+          full_name, email, _id, phone, picture, role, stripe_id,
+        }
+      }, res.statusCode));
     }
-    
+
     userExists.login_type = req.body.login_type;
     await userExists.save()
     const { full_name, phone, email, _id, picture, role, stripe_id } = userExists;
     const token = jwt.sign({ _id, email, full_name, role }, key.SECRET, { expiresIn: "30 days" });
-    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDay() + 30)});
-    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", { 
-      token, expires_at, user: { full_name, email, _id, phone, picture, role, stripe_id
-    }}, res.statusCode));
+    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDay() + 30) });
+    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", {
+      token, expires_at, user: {
+        full_name, email, _id, phone, picture, role, stripe_id
+      }
+    }, res.statusCode));
   } catch (err: any) {
     return res.status(500).json(error("We could not process your request. Try again after a while or contact our support", res.statusCode));
   }
@@ -81,12 +85,12 @@ export const email_signup = async (req: Request, res: Response) => {
     if (user) return res.status(400).json(error("Email already exists", res.statusCode));
     const code = sms_code();
     const hash = bcrypt.hashSync(data.password, 12);
-    let newUser = new User({ 
-      full_name: data.full_name, 
-      email: data.email, 
-      password: hash, 
-      phone: data.phone, 
-      picture: data.picture, 
+    let newUser = new User({
+      full_name: data.full_name,
+      email: data.email,
+      password: hash,
+      phone: data.phone,
+      picture: data.picture,
       verification_code: code,
       role: role?._id,
       otp_expires: moment(new Date()).add(5, "minutes")
@@ -107,10 +111,12 @@ export const email_signup = async (req: Request, res: Response) => {
     const expires_at = new Date(now.setDate(now.getDate() + 30));
     const { full_name, phone, email, _id, picture, stripe_id } = newUser;
     const token = jwt.sign({ _id, email, full_name, role }, key.SECRET, { expiresIn: "30d" });
-    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000)});
-    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", { 
-      token, expires_at, user: { full_name, email, _id, phone, picture, role, stripe_id,
-    }}, res.statusCode));
+    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000) });
+    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", {
+      token, expires_at, user: {
+        full_name, email, _id, phone, picture, role, stripe_id,
+      }
+    }, res.statusCode));
   } catch (err: any) {
     Logger.error(JSON.stringify(err))
     return res.status(500).json(error("We could not process your request. Try again after a while or contact our support for help", res.statusCode));
@@ -130,11 +136,11 @@ export const email_validation = async (req: Request, res: Response) => {
 export const resend_otp = async (req: Request, res: Response) => {
   try {
     const code: string = sms_code();
-    let user = await User.findOneAndUpdate({ phone: req.body.phone }, { 
-      $set: { verification_code: code, otp_expires: moment(new Date()).add(5, "minutes")}
+    let user = await User.findOneAndUpdate({ phone: req.body.phone }, {
+      $set: { verification_code: code, otp_expires: moment(new Date()).add(5, "minutes") }
     }, { new: true });
     if (!user) return res.status(400).json(error("Phone number not found!", res.statusCode));
-    
+
     const sms = await sendSMS({
       message: `Your verification code is: ${code}`,
       to: user && user.phone,
@@ -143,8 +149,8 @@ export const resend_otp = async (req: Request, res: Response) => {
     user.verification_code = code;
     await user.save();
     if (sms && !sms.sid) return res.status(400).json(error(`We could not send OTP to ${user.phone}`, res.statusCode));
-    
-    return res.json(success("Success", { message: `We have sent a phone number verification code to your ${user.phone}`}, res.statusCode));
+
+    return res.json(success("Success", { message: `We have sent a phone number verification code to your ${user.phone}` }, res.statusCode));
   } catch (err: any) {
     return res.status(500).json(error("We could not process your request. Try again after a while or contact our support for help", res.statusCode))
   }
@@ -152,17 +158,19 @@ export const resend_otp = async (req: Request, res: Response) => {
 
 export const verify_phone_number = async (req: Request, res: Response) => {
   try {
-    let user = await User.findOne({ verification_code: req.body.code, otp_expires: { $gte: new Date() }});
+    let user = await User.findOne({ verification_code: req.body.code, otp_expires: { $gte: new Date() } });
     if (!user) return res.status(400).json(error("Invalid code or code has expired", res.statusCode));
     user.verification_code = null;
     user.phone_verified = true;
     user = await user.save();
     const { full_name, phone, phone_verified, email, _id, picture, stripe_id } = user;
     const token = jwt.sign({ _id, email, phone_verified, full_name }, key.SECRET, { expiresIn: "30 days" });
-    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000)});
-    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", { 
-      token, user: { full_name, email, _id, phone, picture, stripe_id
-    }}, res.statusCode));
+    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000) });
+    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", {
+      token, user: {
+        full_name, email, _id, phone, picture, stripe_id
+      }
+    }, res.statusCode));
   } catch (err: any) {
     return res.status(500).json(error("We could not process your request. Try again after a while or contact our support for help", res.statusCode));
   }
@@ -178,12 +186,14 @@ export const email_login = async (req: Request, res: Response) => {
     const expires_at = new Date(now.setDate(now.getDate() + 30));
     const { full_name, email, _id, phone, phone_verified, role, stripe_id } = userExists;
     const token = jwt.sign({ _id, email, full_name, role }, key.SECRET, { expiresIn: "30 days" });
-    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000)});
+    res.cookie("token", `Bearer ${token}`, { expires: new Date(new Date().getDate() + 64800000) });
     userExists.login_type = req.body.login_type;
     await userExists.save();
-    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", { 
-      token, expires_at, user: { full_name, email, _id, phone_verified, phone, role, stripe_id 
-    }}, res.statusCode));
+    return res.header("authorization", `Bearer ${token}`).json(success("Login success!", {
+      token, expires_at, user: {
+        full_name, email, _id, phone_verified, phone, role, stripe_id
+      }
+    }, res.statusCode));
   } catch (err: any) {
     return res.status(500).json(error("We could not process your request. Try again after a while or contact our support for help", res.statusCode));
   }
@@ -234,7 +244,7 @@ export const add_stripe_id = async (req: Request, res: Response) => {
   try {
     let user = await User.findById(req.body.id);
     if (!user) return res.status(404).json(error("User not found", res.statusCode));
-    user = await User.findByIdAndUpdate(req.body.id, { $set: { stripe_id: req.body.stripe_id }}, { new: true });
+    user = await User.findByIdAndUpdate(req.body.id, { $set: { stripe_id: req.body.stripe_id } }, { new: true });
     return res.json(success("Success", user, res.statusCode));
   } catch (err: any) {
     return res.status(500).json(error("Something went wrong. Contact support for assistance", res.statusCode));
@@ -244,7 +254,7 @@ export const add_stripe_id = async (req: Request, res: Response) => {
 export const add_address = async (req: Request, res: Response) => {
   try {
     const data: IAddress = req.body;
-    const user = await User.findByIdAndUpdate(data.user_id, { $set: { address: data }}, { new: true });
+    const user = await User.findByIdAndUpdate(data.user_id, { $set: { address: data } }, { new: true });
     if (!user) return res.status(404).json(error("User not found", res.statusCode));
     const address = user && user.address;
     return res.json(success("Success", address, res.statusCode));
@@ -313,24 +323,24 @@ export const customer_db_list = async (req: Request, res: Response) => {
       const user_count = await User.countDocuments({});
 
       const last_month_total_users = await User.countDocuments({
-        createdAt: { 
-          $gte: new Date(last_month_start.setHours(0o0, 0o0, 0o0)), 
+        createdAt: {
+          $gte: new Date(last_month_start.setHours(0o0, 0o0, 0o0)),
           $lte: new Date(last_month_end.setHours(23, 59, 59))
         }
       });
 
       const this_month_total_users = await User.countDocuments({
-        createdAt: { 
-          $gte: new Date(this_month_start.setHours(0o0, 0o0, 0o0)), 
+        createdAt: {
+          $gte: new Date(this_month_start.setHours(0o0, 0o0, 0o0)),
           $lte: new Date(this_month_end.setHours(23, 59, 59))
         }
       });
 
       const total_user_diff = this_month_total_users - last_month_total_users;
-      const total_user_percentage_from_last_month = ((100 * total_user_diff)/last_month_total_users).toFixed(2);
-     
+      const total_user_percentage_from_last_month = ((100 * total_user_diff) / last_month_total_users).toFixed(2);
+
       // active users
-      const active_users = await User.countDocuments({ last_order_date: { $lt: new Date(new Date().getTime() - 90 * 24 * 60 * 60 * 1000) }});
+      const active_users = await User.countDocuments({ last_order_date: { $lt: new Date(new Date().getTime() - 90 * 24 * 60 * 60 * 1000) } });
 
       const last_month_total_active_users = await User.countDocuments({
         last_order_date: { $gt: new Date(last_month_end.getTime() - 90 * 24 * 60 * 60 * 1000) }
@@ -343,10 +353,10 @@ export const customer_db_list = async (req: Request, res: Response) => {
       });
 
       const active_user_diff = +this_month_total_active_users - +last_month_total_active_users
-      const active_user_percentage_from_last_month = active_user_diff === 0 ? "0.00" : ((100 * active_user_diff)/last_month_total_active_users).toFixed(2);
+      const active_user_percentage_from_last_month = active_user_diff === 0 ? "0.00" : ((100 * active_user_diff) / last_month_total_active_users).toFixed(2);
 
       // inactive users
-      const inactive_users = await User.countDocuments({ last_order_date: { $gte: new Date(new Date().getTime() - 90 * 24 * 60 * 60 * 1000) }});
+      const inactive_users = await User.countDocuments({ last_order_date: { $gte: new Date(new Date().getTime() - 90 * 24 * 60 * 60 * 1000) } });
 
       const last_month_total_inactive_users = await User.countDocuments({
         last_order_date: { $lte: new Date(last_month_end.getTime() - 90 * 24 * 60 * 60 * 1000) }
@@ -357,9 +367,9 @@ export const customer_db_list = async (req: Request, res: Response) => {
           $lte: new Date(this_month_end.getTime() - 90 * 24 * 60 * 60 * 1000)
         }
       });
-      
+
       const inactive_user_diff = +this_month_total_inactive_users - +last_month_total_inactive_users
-      const inactive_user_percentage_from_last_month = inactive_user_diff === 0 ? "0.00" : ((100 * inactive_user_diff)/last_month_total_inactive_users)
+      const inactive_user_percentage_from_last_month = inactive_user_diff === 0 ? "0.00" : ((100 * inactive_user_diff) / last_month_total_inactive_users)
       const response = {
         total_customers: user_count,
         active_users,
@@ -368,33 +378,33 @@ export const customer_db_list = async (req: Request, res: Response) => {
         active_user_percentage_from_last_month: `${active_user_percentage_from_last_month}%`,
         inactive_user_percentage_from_last_month: `${inactive_user_percentage_from_last_month}%`
       }
-     
+
       return res.json(success("Success", response, res.statusCode));
     } else if (date_filter.toString().toLowerCase() === "last month") {
 
-      const user_count = await User.countDocuments({ 
+      const user_count = await User.countDocuments({
         createdAt: { $gte: last_month_start, $lte: last_month_end }
       });
 
       const last_month_total_users = await User.countDocuments({
-        createdAt: { 
-          $gte: new Date(last_month_start.setHours(0o0, 0o0, 0o0)), 
+        createdAt: {
+          $gte: new Date(last_month_start.setHours(0o0, 0o0, 0o0)),
           $lte: new Date(last_month_end.setHours(23, 59, 59))
         }
       });
 
       const this_month_total_users = await User.countDocuments({
-        createdAt: { 
-          $gte: new Date(this_month_start.setHours(0o0, 0o0, 0o0)), 
+        createdAt: {
+          $gte: new Date(this_month_start.setHours(0o0, 0o0, 0o0)),
           $lte: new Date(this_month_end.setHours(23, 59, 59))
         }
       });
 
       const total_user_diff = this_month_total_users - last_month_total_users;
-      const total_user_percentage_from_last_month = ((100 * total_user_diff)/last_month_total_users).toFixed(2);
-     
+      const total_user_percentage_from_last_month = ((100 * total_user_diff) / last_month_total_users).toFixed(2);
+
       // active users
-      const active_users = await User.countDocuments({ last_order_date: { $lt: new Date(new Date(last_month_end).getTime() - 90 * 24 * 60 *60 * 1000) }});
+      const active_users = await User.countDocuments({ last_order_date: { $lt: new Date(new Date(last_month_end).getTime() - 90 * 24 * 60 * 60 * 1000) } });
 
       const last_month_total_active_users = await User.countDocuments({
         last_order_date: { $gt: new Date(last_month_end.getTime() - 90 * 24 * 60 * 60 * 1000) }
@@ -407,10 +417,10 @@ export const customer_db_list = async (req: Request, res: Response) => {
       });
 
       const active_user_diff = +this_month_total_active_users - +last_month_total_active_users
-      const active_user_percentage_from_last_month = active_user_diff === 0 ? "0.00" : ((100 * active_user_diff)/last_month_total_active_users).toFixed(2);
+      const active_user_percentage_from_last_month = active_user_diff === 0 ? "0.00" : ((100 * active_user_diff) / last_month_total_active_users).toFixed(2);
 
       // inactive users
-      const inactive_users = await User.countDocuments({ last_order_date: { $gte: new Date(new Date(last_month_end).getTime() - 90 * 24 * 60 *60 * 1000) }});
+      const inactive_users = await User.countDocuments({ last_order_date: { $gte: new Date(new Date(last_month_end).getTime() - 90 * 24 * 60 * 60 * 1000) } });
 
       const last_month_total_inactive_users = await User.countDocuments({
         last_order_date: { $lte: new Date(last_month_end.getTime() - 90 * 24 * 60 * 60 * 1000) }
@@ -421,9 +431,9 @@ export const customer_db_list = async (req: Request, res: Response) => {
           $lte: new Date(this_month_end.getTime() - 90 * 24 * 60 * 60 * 1000)
         }
       });
-      
+
       const inactive_user_diff = +this_month_total_inactive_users - +last_month_total_inactive_users
-      const inactive_user_percentage_from_last_month = inactive_user_diff === 0 ? "0.00" : ((100 * inactive_user_diff)/last_month_total_inactive_users)
+      const inactive_user_percentage_from_last_month = inactive_user_diff === 0 ? "0.00" : ((100 * inactive_user_diff) / last_month_total_inactive_users)
       const response = {
         total_customers: user_count,
         active_users,
@@ -432,11 +442,11 @@ export const customer_db_list = async (req: Request, res: Response) => {
         active_user_percentage_from_last_month: `${active_user_percentage_from_last_month}%`,
         inactive_user_percentage_from_last_month: `${inactive_user_percentage_from_last_month}%`
       }
-     
+
       return res.json(success("Success", response, res.statusCode));
     } else if (regex.test(date_filter.toString())) {
       const now = new Date(date_filter.toLocaleString());
-      
+
       const start_date = new Date(now.setDate(1));
       const end_date = last_day_of_month(now);
 
@@ -445,29 +455,29 @@ export const customer_db_list = async (req: Request, res: Response) => {
       const this_month_start = new Date(this_month.setDate(1));
       const this_month_end = last_day_of_month(this_month);
 
-      const user_count = await User.countDocuments({ 
+      const user_count = await User.countDocuments({
         createdAt: { $gte: start_date, $lte: end_date }
       });
 
       const last_month_total_users = await User.countDocuments({
-        createdAt: { 
-          $gte: new Date(last_month_start.setHours(0o0, 0o0, 0o0)), 
+        createdAt: {
+          $gte: new Date(last_month_start.setHours(0o0, 0o0, 0o0)),
           $lte: new Date(last_month_end.setHours(23, 59, 59))
         }
       });
 
       const this_month_total_users = await User.countDocuments({
-        createdAt: { 
-          $gte: new Date(this_month_start.setHours(0o0, 0o0, 0o0)), 
+        createdAt: {
+          $gte: new Date(this_month_start.setHours(0o0, 0o0, 0o0)),
           $lte: new Date(this_month_end.setHours(23, 59, 59))
         }
       });
 
       const total_user_diff = this_month_total_users - last_month_total_users;
-      const total_user_percentage_from_last_month = ((100 * total_user_diff)/last_month_total_users).toFixed(2);
-     
+      const total_user_percentage_from_last_month = ((100 * total_user_diff) / last_month_total_users).toFixed(2);
+
       // active users
-      const active_users = await User.countDocuments({ last_order_date: { $lt: new Date(new Date().getTime() - 90 * 24 * 60 *60 * 1000) }});
+      const active_users = await User.countDocuments({ last_order_date: { $lt: new Date(new Date().getTime() - 90 * 24 * 60 * 60 * 1000) } });
 
       const last_month_total_active_users = await User.countDocuments({
         last_order_date: { $gt: new Date(last_month_end.getTime() - 90 * 24 * 60 * 60 * 1000) }
@@ -480,10 +490,10 @@ export const customer_db_list = async (req: Request, res: Response) => {
       });
 
       const active_user_diff = +this_month_total_active_users - +last_month_total_active_users
-      const active_user_percentage_from_last_month = active_user_diff === 0 ? "0.00" : ((100 * active_user_diff)/last_month_total_active_users).toFixed(2);
+      const active_user_percentage_from_last_month = active_user_diff === 0 ? "0.00" : ((100 * active_user_diff) / last_month_total_active_users).toFixed(2);
 
       // inactive users
-      const inactive_users = await User.countDocuments({ last_order_date: { $gte: new Date(new Date().getTime() - 90 * 24 * 60 *60 * 1000) }});
+      const inactive_users = await User.countDocuments({ last_order_date: { $gte: new Date(new Date().getTime() - 90 * 24 * 60 * 60 * 1000) } });
 
       const last_month_total_inactive_users = await User.countDocuments({
         last_order_date: { $lte: new Date(last_month_end.getTime() - 90 * 24 * 60 * 60 * 1000) }
@@ -494,9 +504,9 @@ export const customer_db_list = async (req: Request, res: Response) => {
           $lte: new Date(this_month_end.getTime() - 90 * 24 * 60 * 60 * 1000)
         }
       });
-      
+
       const inactive_user_diff = +this_month_total_inactive_users - +last_month_total_inactive_users
-      const inactive_user_percentage_from_last_month = inactive_user_diff === 0 ? "0.00" : ((100 * inactive_user_diff)/last_month_total_inactive_users)
+      const inactive_user_percentage_from_last_month = inactive_user_diff === 0 ? "0.00" : ((100 * inactive_user_diff) / last_month_total_inactive_users)
       const response = {
         total_customers: user_count,
         active_users,
@@ -505,7 +515,7 @@ export const customer_db_list = async (req: Request, res: Response) => {
         active_user_percentage_from_last_month: `${active_user_percentage_from_last_month}%`,
         inactive_user_percentage_from_last_month: `${inactive_user_percentage_from_last_month}%`
       }
-     
+
       return res.json(success("Success", response, res.statusCode));
     }
   } catch (err: any) {
@@ -567,11 +577,11 @@ export const admin_dashboard_customer_details = async (req: Request, res: Respon
     const food_bowls_order_count = all_orders.filter(order => order?.merchant_category?.toLowerCase() === "food bowls").length;
     const finger_foods_order_count = all_orders.filter(order => order?.merchant_category?.toLowerCase() === "finger foods").length;
     // Percentage calculation
-    const restaurant_percentage = restaurant_order_count === 0 ? "0.00" : ((100 * restaurant_order_count)/all_orders.length).toFixed(2);
-    const cake_percentage = cake_order_count === 0 ? "0.00" : ((100 * cake_order_count)/all_orders.length).toFixed(2);
-    const grocery_percentage = grocery_order_count === 0 ? "0.00" : ((100 * grocery_order_count)/all_orders.length).toFixed(2);
-    const food_bowl_percentage = food_bowls_order_count === 0 ? "0.00" : ((100 * food_bowls_order_count)/all_orders.length).toFixed(2);
-    const finger_food_percentage = finger_foods_order_count === 0 ? "0.00" : ((100 * finger_foods_order_count)/all_orders.length).toFixed(2);
+    const restaurant_percentage = restaurant_order_count === 0 ? "0.00" : ((100 * restaurant_order_count) / all_orders.length).toFixed(2);
+    const cake_percentage = cake_order_count === 0 ? "0.00" : ((100 * cake_order_count) / all_orders.length).toFixed(2);
+    const grocery_percentage = grocery_order_count === 0 ? "0.00" : ((100 * grocery_order_count) / all_orders.length).toFixed(2);
+    const food_bowl_percentage = food_bowls_order_count === 0 ? "0.00" : ((100 * food_bowls_order_count) / all_orders.length).toFixed(2);
+    const finger_food_percentage = finger_foods_order_count === 0 ? "0.00" : ((100 * finger_foods_order_count) / all_orders.length).toFixed(2);
     const category_of_orders = {
       total_order_count: all_orders.length,
       restaurant_percentage: `${restaurant_percentage}%`,
@@ -598,7 +608,7 @@ export const dashboard_customer_recent_orders = async (req: Request, res: Respon
   try {
     const { offset, limit } = pagination(req.query);
     const { user_id } = req.query;
-    const all_orders = await Order.paginate({ userId: user_id }, { limit, offset, sort: { createdAt: -1 }, populate: ["restaurantId", "restaurantId.merchant_type"]});
+    const all_orders = await Order.paginate({ userId: user_id }, { limit, offset, sort: { createdAt: -1 }, populate: ["restaurantId", "restaurantId.merchant_type"] });
     return res.json(success("Success", all_orders, res.statusCode));
   } catch (err: any) {
     Logger.error(JSON.stringify(err));
@@ -610,16 +620,16 @@ export const dashboard_customer_recent_transactions = async (req: Request, res: 
   try {
     const { offset, limit } = pagination(req.query);
     const { user_id } = req.query;
-    const all_orders = await Order.paginate({ 
-        userId: user_id 
-      }, 
-      { 
-        limit, 
-        offset, 
+    const all_orders = await Order.paginate({
+      userId: user_id
+    },
+      {
+        limit,
+        offset,
         sort: { createdAt: -1 },
-        select: ["reference_code", "createdAt", "merchant_category", "restaurantId", "status"], 
+        select: ["reference_code", "createdAt", "merchant_category", "restaurantId", "status"],
         populate: ["restaurantId", "restaurantId.merchant_type"]
-    });
+      });
     return res.json(success("Success", all_orders, res.statusCode));
   } catch (err: any) {
     Logger.error(JSON.stringify(err));

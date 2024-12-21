@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import path from 'path';
 
-import key from '../config/key';
+import key from './key';
 import Logger from '../utils/logger';
 
 require("dotenv").config({ path: path.resolve(__dirname + "/../../.env") });

@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { IRoleCreate, IRolePermission } from "./role.interface";
 import Logger from "../../utils/logger";
 import { paginated_data } from "../../middleware/pagination";
-import { Permission } from "../../controllers/permission/permission.schema";
+import { Permission } from "../permission/permission.schema";
 
 export const create = async (req: Request, res: Response) => {
   try {
@@ -36,7 +36,7 @@ export const getRoles = async (req: Request, res: Response) => {
 export const getClientRoles = async (req: Request, res: Response) => {
   try {
     const { page, limit } = req.query;
-    const roles = await Role.find({ name: { $nin: ["super admin", "admin" ]}}).populate("permissions");
+    const roles = await Role.find({ name: { $nin: ["super admin", "admin"] } }).populate("permissions");
     const result = paginated_data(roles, +page, +limit);
     return res.json(success("Success", result, res.statusCode));
   } catch (err: any) {
@@ -59,7 +59,7 @@ export const addPermissions = async (req: Request, res: Response) => {
           name: permissionExists.name,
           _id: permissionExists._id
         }
-        role = await Role.findByIdAndUpdate(role_id, { $push: { permissions: data }}, { new: true });
+        role = await Role.findByIdAndUpdate(role_id, { $push: { permissions: data } }, { new: true });
       } else {
         return res.status(400).json(error(`Permission: ${permissionExists?.name}, already exists in ${roleExists?.name}`, res.statusCode));
       }
