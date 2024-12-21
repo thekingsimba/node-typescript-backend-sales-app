@@ -1,0 +1,4572 @@
+swagger: "2.0"
+info:
+  title: Sales app API docs
+  description: Sales app API docs
+  version: 1.0
+  contact:
+    email: company@hello.mail
+  license:
+    name: MIT
+    url: "http://mit.com/"
+  servers:
+    - url: http://localhost:8000
+      description: This is my local server
+
+schemes: [http, https]
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: >-
+      Enter the token with the `Bearer: ` prefix, e.g. "Bearer abcde12345"
+paths:
+  # File upload API
+  /api/files/upload:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - FILE UPLOADS
+      summary: UPLOADS
+      description: It uploads files
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          type: file
+          name: file
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message: 
+                type: string
+                default: Success
+              error: 
+                type: boolean
+                default: false
+              code: 
+                type: number
+                default: 200
+              results: 
+                type: string
+                default: https://alphaobjectcontainer.s3.amazonaws.com/z_3UuJZMA-Screencast%20from%2012-05-2022%2010%3A34%3A53%20AM.webm
+
+  /api/auth/forgot_password:
+    post:
+      tags:
+        - AUTH
+      summary: FORGOT PASSWORD
+      description: SENDS FORGOT PASSWORD CODE TO THE ACCOUNT EMAIL
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Category
+          type: object
+          schema:
+            properties:
+              user_type:
+                type: string
+                default: merchant
+                enum:
+                  - admin
+                  - merchant
+                  - user
+              email:
+                type: string
+                default: doe@gmail.com
+      responses:
+        200:
+          description: Success
+
+  /api/auth/reset_password:
+    post: 
+      tags:
+        - AUTH
+      summary: RESET
+      description: RESETS THE ACCOUNT PASSWORD
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              user_type:
+                type: string
+                default: merchant
+                enum:
+                  - admin
+                  - merchant
+                  - user
+              otp:
+                type: number
+                default: 263825
+              password:
+                type: string
+                default: password123
+      responses:
+        200:
+          description: Success
+
+  /api/auth/resend_code:
+    post: 
+      tags:
+        - AUTH
+      summary: RESEND
+      description: THIS RESENDS CODE
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              user_type:
+                type: string
+                default: merchant
+                enum:
+                  - admin
+                  - merchant
+                  - user
+              email:
+                type: string
+                default: doe@gmail.com
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/create:
+    post:
+      tags:
+        - MERCHANT
+      summary: Create Merchant
+      description: It creates a new merchant
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+      - in: body
+        name: merchant
+        schema:
+         $ref: "#/components/schemas/Merchant"
+              
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              messsage:
+                type: string
+                default: Success
+              error:
+                type: boolean
+                default: false
+              code:
+                type: number
+                default: 200
+              results:
+                properties:
+                  _id: 
+                    type: string
+                    default: 63826b7cb61e8d8fc2a42890
+                  first_name:
+                    type: string
+                    default: John
+                  last_name:
+                    type: string
+                    default: Doe
+                  email:
+                    type: string
+                    default: jondoe@domain.com
+                  phone_number: 
+                    type: string
+                    default: +2348012345678
+                  password:
+                    type: string
+                    default: johndoe123
+                  restuarant_name: 
+                    type: string
+                    default: Nsala Kitchen
+                  address: 
+                    # type: object
+                    properties:
+                      line_1: 
+                        type: string
+                        default: 1, Chris Ben lane
+                      line_2: 
+                        type: string
+                        default: 2 Chris Ben lane
+                      city: 
+                        type: string
+                        default: chicago
+                      post_code:
+                        type: string
+                        default: 1000781
+                      country: 
+                        type: string
+                        default: United Kingdom
+                  createdAt:
+                    type: date
+                    default: 2022-11-26T19:39:40.615Z
+                  updatedAt:
+                    type: date
+                    default: 2022-11-26T19:39:40.615Z
+                  _v:
+                    type: number
+                    default: 0
+        400:
+          description: Error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                default: Email already exists
+              error:
+                type: boolean
+                default: true
+              code:
+                type: number
+                default: 400
+  
+  /api/merchant/otp:
+    post:
+      tags:
+        - MERCHANT
+      summary: GENERATES OTP CODE
+      desscription: SEND OTP CODE TO MERCHANTS' PHONE NUMBERS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              phone_number:
+                type: string
+                default: "+447584354542"
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              code: 
+                type: number
+                default: 200
+              message:
+                type: string
+                default: Success
+              error:
+                type: boolean
+                default: false
+              results:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: We have sent a phone number verification code to your +447584354542
+                  
+  /api/merchant/verify/phone:
+    post:
+      tags:
+        - MERCHANT
+      summary: VERIFY OTP CODE
+      desscription: VERIFIES OTP CODE SENT TO MERCHANTS' PHONE NUMBERS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                default: 123456
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              code: 
+                type: number
+                default: 200
+              message:
+                type: string
+                default: Success
+              error:
+                type: boolean
+                default: false
+              results:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: Phone number verified
+
+  # Login API
+  /api/merchant/login:
+    post:
+      tags:
+        - MERCHANT
+      summary: Merchant Login
+      desscription: Logs in merchant account
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Login
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                default: jondoe@domain.com
+              password:
+                type: string
+                default: johndoe123
+      responses:
+        200:
+          description: Login success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Login success!
+              error:
+                type: boolean
+                default: false
+              code:
+                type: number
+                default: 200
+              results:
+                properties:
+                  token: 
+                    type: string
+                    default: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzlkNjY2OTkxMmNiMjUyYWE0ZDBlZWIiLCJlbWFpbCI6ImpvaG5kb2VAZG9tYWluLmNvbSIsImZpcnN0X25hbWUiOiJKb2huIiwiaWF0IjoxNjcxMjYxOTc4LCJleHAiOjE2NzEzNDgzNzh9.Sp8iX_-WHOArJWUspz6NFF4cOTfx3PcM5ft1z-n1Pxk"
+                  restuarant:
+                    properties:
+
+        400:
+          description: Error
+          schema:
+            properties:
+              message:
+                type: string
+                default: Invalid password
+              error:
+                type: boolean
+                default: true
+              code:
+                type: number
+                default: 400
+
+  /api/merchant/all:
+    get:
+      tags:
+        - MERCHANT
+      summary: Merchant list
+      description: Fetches list of merchants
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              error:
+                type: boolean
+                default: false
+              code:
+                type: number
+                default: 200
+              results:
+                properties:
+                  docs:
+                    properties:
+                      _id: 
+                        type: string
+                        default: 63826b7cb61e8d8fc2a42890
+                      first_name:
+                        type: string
+                        default: John
+                      last_name:
+                        type: string
+                        default: Doe
+                      email:
+                        type: string
+                        default: jondoe@domain.com
+                      phone_number: 
+                        type: string
+                        default: +2348012345678
+                      password:
+                        type: string
+                        default: johndoe123
+                      restuarant_name: 
+                        type: string
+                        default: Nsala Kitchen
+                      address: 
+                        # type: object
+                        properties:
+                          line_1: 
+                            type: string
+                            default: 1, Chris Ben lane
+                          line_2: 
+                            type: string
+                            default: 2 Chris Ben lane
+                          city: 
+                            type: string
+                            default: chicago
+                          post_code:
+                            type: string
+                            default: 1000781
+                          country: 
+                            type: string
+                            default: United Kingdom
+                      createdAt:
+                        type: date
+                        default: 2022-11-26T19:39:40.615Z
+                      updatedAt:
+                        type: date
+                        default: 2022-11-26T19:39:40.615Z
+                      _v:
+                        type: number
+                        default: 0
+        403:
+          description: Invalid token
+          schema:
+            properties:
+              message:
+                type: string
+                defult: Access denied. No token provided
+              code: 
+                type: number
+                default: 403
+              error: 
+                type: boolean
+                default: true
+
+  /api/merchant/details:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: Merchant details
+      description: Fetches Merchant's Details
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: id
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              error:
+                type: boolean
+                default: false
+              code:
+                type: number
+                default: 200
+              results:
+                properties:
+                  docs:
+                    properties:
+                      _id: 
+                        type: string
+                        default: 63826b7cb61e8d8fc2a42890
+                      first_name:
+                        type: string
+                        default: John
+                      last_name:
+                        type: string
+                        default: Doe
+                      email:
+                        type: string
+                        default: jondoe@domain.com
+                      phone_number: 
+                        type: string
+                        default: +2348012345678
+                      password:
+                        type: string
+                        default: johndoe123
+                      restuarant_name: 
+                        type: string
+                        default: Nsala Kitchen
+                      address: 
+                        # type: object
+                        properties:
+                          line_1: 
+                            type: string
+                            default: 1, Chris Ben lane
+                          line_2: 
+                            type: string
+                            default: 2 Chris Ben lane
+                          city: 
+                            type: string
+                            default: chicago
+                          post_code:
+                            type: string
+                            default: 1000781
+                          country: 
+                            type: string
+                            default: United Kingdom
+                      createdAt:
+                        type: date
+                        default: 2022-11-26T19:39:40.615Z
+                      updatedAt:
+                        type: date
+                        default: 2022-11-26T19:39:40.615Z
+                      _v:
+                        type: number
+                        default: 0
+        403:
+          description: Invalid token
+          schema:
+            properties:
+              message:
+                type: string
+                default: Access denied. No token provided
+              code: 
+                type: number
+                default: 403
+              error: 
+                type: boolean
+                default: true
+        404:
+          description: Not found
+          schema:
+            properties:
+              message:
+                type: string
+                default: Merchant not found
+              error:
+                type: boolean
+                default: true
+              code:
+                type: number
+                default: 404
+              
+  /api/merchant/store-by-name:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: STORE BY NAME
+      description: RETURNS STORE DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: slug
+      responses:
+        200:
+          description: Success response
+
+  /api/merchant/update:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: Update Merchant
+      description: It updates merchant details
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: body
+          schema:
+            $ref: "#/components/schemas/Merchant"
+      responses:
+        200:
+          description: Success response
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              error:
+                type: boolean
+                default: false
+              code:
+                type: number
+                default: 200
+              results:
+                properties:
+                  docs:
+                    properties:
+                      _id: 
+                        type: string
+                        default: 63826b7cb61e8d8fc2a42890
+                      first_name:
+                        type: string
+                        default: John
+                      last_name:
+                        type: string
+                        default: Doe
+                      email:
+                        type: string
+                        default: jondoe@domain.com
+                      phone_number: 
+                        type: string
+                        default: +2348012345678
+                      password:
+                        type: string
+                        default: johndoe123
+                      restuarant_name: 
+                        type: string
+                        default: Nsala Kitchen
+                      location:
+                        type: object
+                        properties:
+                          coordinates:
+                            type: array
+                            items:
+                              longitude:
+                                type: number
+                                default: 3.634547
+                              latitude:
+                                type: number
+                                default: 6.3289535
+                      address: 
+                        type: object
+                        properties:
+                          line_1: 
+                            type: string
+                            default: 1, Chris Ben lane
+                          line_2: 
+                            type: string
+                            default: 2 Chris Ben lane
+                          city: 
+                            type: string
+                            default: chicago
+                          post_code:
+                            type: string
+                            default: 1000781
+                          country: 
+                            type: string
+                            default: United Kingdom
+                      createdAt:
+                        type: date
+                        default: 2022-11-26T19:39:40.615Z
+                      updatedAt:
+                        type: date
+                        default: 2022-11-26T19:39:40.615Z
+                      _v:
+                        type: number
+                        default: 0
+          403:
+            description: Invalid token
+            schema:
+              properties:
+                message:
+                  type: string
+                  default: Access denied. No token provided
+                code: 
+                  type: number
+                  default: 403
+                error: 
+                  type: boolean
+                  default: true
+          404:
+            description: Not found
+            schema:
+              properties:
+                message:
+                  type: string
+                  default: Restaurant not found
+                error:
+                  type: boolean
+                  default: true
+                code:
+                  type: number
+                  default: 404
+
+  /api/merchant/delete:
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: DELETE MERCHANT
+      description: It deletes restaurant
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: id
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/approve:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: DELETE MERCHANT
+      description: It deletes restaurant
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 63826b7cb61e8d8fc2a42890
+              status:
+                type: string
+                default: verified
+                enum:
+                  - verified
+                  - rejected
+                  - pending
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/around_you:
+    get:
+      tags:
+        - MERCHANT
+      summary: MERCHANTS AROUND YOU
+      description: FETCHES MERCHANTS AROUND YOU
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: number
+        - in: query
+          name: limit
+          type: number 
+        - in: query
+          name: lat
+          type: number
+          default: 6.50153
+        - in: query
+          name: long
+          type: number
+          default: 3.35808
+        - in: query
+          name: merchant_type
+          type: string
+          default: 64a1dd31d24a4a28a747af2f
+        - in: query
+          name: radius
+          type: number
+          default: 1
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/permission:
+    put:
+      security:
+        - Bearer: []
+      tags: 
+        - MERCHANT
+      summary: PERMISSION
+      description: ADD PERMISSIONS TO MERCHANT
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              permissions:
+                type: array
+                default: ["createOwn"]
+                required: true
+                enum:
+                  - "createOwn"
+                  - "readOwn"
+                  - "updateOwn"
+              merchantId: 
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+                required: true
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/offers/around_you:
+    get:
+      tags:
+        - MERCHANT
+      summary: MERCHANTS AROUND YOU
+      description: FETCHES MERCHANTS AROUND YOU
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: authorization
+          type: string
+        - in: query
+          name: page
+          type: number
+        - in: query
+          name: limit
+          type: number 
+        - in: query
+          name: lat
+          type: number
+        - in: query
+          name: long
+          type: number 
+        - in: query
+          name: merchant_type
+          type: string
+        - in: query
+          name: radius
+          type: number
+          default: 1
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/set_offer:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: SPECIAL OFFER
+      description: SET SPECIAL OFFER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object 
+          schema:
+            properties:
+              merchantId:
+                type: string
+                default: 63826b7cb61e8d8fc2a42890
+                require: true
+              offer_amount:
+                type: number
+                default: 20
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/end_offer:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: SPECIAL OFFER
+      description: SET SPECIAL OFFER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object 
+          schema:
+            properties:
+              merchantId:
+                type: string
+                default: 63826b7cb61e8d8fc2a42890
+                require: true
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/rating:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT RATING
+      description: RATES FOODS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestbody
+          schema:
+            properties:
+              merchantId:
+                type: string
+                default: ""
+              rate:
+                type: number
+                default: 4
+              userId:
+                type: string
+                default: ""
+              review:
+                type: string
+                default: Awesome food
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/ratings:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT RATING
+      description: RETURNS MERCHANT RATINGS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: name
+      responses:
+        200:
+          description: Success       
+
+  /api/merchant/restaurant/ratings:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT RATINGS
+      description: RETURNS LIST OF A MERCHANT'S RATINGS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: merchant_id
+          default: 
+      responses:
+        200:
+          description: Success    
+
+  /api/merchant/notification/settings:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: NOTIFICATIONS
+      description: TOGGLES MERCHANTS' NOTIFICATION SETTINGS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestbody
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              status:
+                type: boolean
+                default: true
+              notification_type:
+                type: string
+                default: live_order
+                enum:
+                  - live_order
+                  - promotion
+                required: true
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/update/bank_details:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: NOTIFICATIONS
+      description: TOGGLES MERCHANTS' NOTIFICATION SETTINGS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestbody
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              bank_name:
+                type: string
+                default: LLOYDS BANK
+              account_name:
+                type: string
+                default: John Doe
+                required: true
+              account_number:
+                type: string
+                default: 1120933113
+              sort_code:
+                type: string
+                default: 77-04-09
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/update/device_token:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: DEVICE TOKEN
+      description: UPDATES MERCHANTS' DEVICE TOKEN
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestbody
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              device_token:
+                type: string
+                default: APA91bFoi3lMMre9G3XzR1LrF4ZT82_15MsMdEICogXSLB8-MrdkRuRQFwNI5u8Dh0cI90ABD3BOKnxkEla8cGdisbDHl5cVIkZah5QUhSAxzx4Roa7b4xy9tvx9iNSYw-eXBYYd8k1XKf8Q_Qq1X9-x-U-Y79vdPq
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/analytics:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT ANALYTICS
+      description: RETURNS ANALYTICS OF MERCHANT DATA
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: date_filter
+          type: string
+          enum:
+            - This month
+            - Last month
+            - 2023/09/01
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/search:
+    get:
+      tags:
+        - MERCHANT
+      summary: SEARCH
+      description: RETURNS MERCHANT LIST BY SEARCH FILTER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: search_term
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/status:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: OPERATION TIME
+      description: SETS MERCHANT OPERATION TIME
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          properties:
+            merchant_id:
+              type: string
+              default: 64a1de88d24a4a28a747af3a
+            status: 
+              type: string
+              default: open
+              enum:
+                - open
+                - closed
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/operation_days/delete_all:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: OPERATION TIME
+      description: DELETES A MERCHANT OPERATION TIME INFORMATION
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/operation_days/remove_one:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: OPERATION TIME
+      description: REMOVES ONE OPERATION TIME DETAIL
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+          default: 64a1de88d24a4a28a747af3a
+        - in: query
+          name: day_id
+          type: string
+          default: 64a1de88d24a4a28a747af3a
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/dashboard/merchant/details:
+    get:
+      security:
+        - Bearer: [] 
+      tags:
+        - MERCHANT
+      summary: DASHBOARD MERCHANT DETAILS
+      description: RETURNS MERCHANT DETAILS
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/dashboard/merchant/transactions:
+    get: 
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: DASHBOARD MERCHANT TRANSACTIONS
+      description: RETURNS MERCHANT TRANSACTIONS
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+  
+  /api/merchant/account/link:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: STRIPE ACCOUNT LINK
+      description: CREATES MERCHANT STRIPE ACCOUNT LINK
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 65786e04a0a3e75be2594d41
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/update/operation_time:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT OPENING AND CLOSING DAYS AND TIME
+      description: SET MERCHANTS' OPENING AND CLOSING DAYS AND TIME
+      parameters:
+        - in: body
+          type: object
+          name: request body
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                require: true
+                default: 65786e04a0a3e75be2594d41
+              operation_days:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    day: 
+                      type: string
+                      require: true
+                      enum: 
+                        - monday
+                        - tuesday
+                        - wednesday
+                        - thursday
+                        - friday
+                        - saturday
+                        - sunday
+                    opening_time:
+                      type: string
+                      require: true
+                      default: "08:00"
+                    closing_time:
+                      type: string
+                      default: "18:00"
+                      require: true
+                    status:
+                      type: string
+                      require: true
+                      enum:
+                        - open
+                        - closed
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/update/close:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT OPENING AND CLOSING DAYS AND TIME
+      description: SET MERCHANTS' OPENING AND CLOSING DAYS AND TIME TO CLOSE/OPEN
+      parameters:
+        - in: body
+          type: object
+          name: request body
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                require: true
+                default: 64a1de88d24a4a28a747af3a
+              day_id:
+                type: string
+                default: 6616f6b11dc21f344564eab9
+              status:
+                type: string
+                default: closed
+                enum:
+                  - open
+                  - closed
+              day:
+                type: string
+                default: monday
+                enum:
+                  - monday
+                  - tuesday
+                  - wednesday
+                  - thursday
+                  - friday
+                  - saturday
+                  - sunday 
+              opening_time:
+                type: string
+                default: 09:00
+              closing_time:
+                type: string
+                default: 23:00
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/update/stripe_connect_status:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT STRIPE CONNECT ACCOUNT STATUS
+      description: UPDATES MERCHANTS' STRIPE CONNECT ACCOUNT SETUP STATUS
+      parameters:
+        - in: query
+          type: string
+          name: merchant_id
+          require: true
+          default: 65786e04a0a3e75be2594d41      
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/operation_days:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT OPERATION DAYS
+      description: RETURNS MERCHANTS' OPERATION DAYS LIST
+      parameters:
+        - in: query
+          type: string
+          name: merchant_id
+          require: true
+          default: 65786e04a0a3e75be2594d41      
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/dashboard/reset_password:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT DASHBOARD PASSWORD RESET
+      description: RESETS MERCHANTS' PASSWORD FROM THEIR DASHBOARD
+      parameters:
+        - in: body
+          name: Request body
+          type: object
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                require: true
+                default: 64a1de88d24a4a28a747af3a     
+              new_password:
+                type: string
+                require: true
+              old_password:
+                type: string
+                require: true
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/verify/email:
+    put:
+      tags:
+        - MERCHANT
+      summary: EMAIL VERIFICATION
+      description: VERIFIES GROCERY MERCHANT EMAIL ADDRESS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: request body
+          type: object
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              results:
+                properties:
+                  message: 
+                    type: string
+                    default: Email verified!
+
+  /api/merchant/fsa/info:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: FSA INSPECTION
+      description: UPDATES FSA INSPECTION INFO
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: request body
+          type: object
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              fsa_inspection_certificate:
+                type: string
+                default: https://customer-fsa-certifacte.pdf
+              fsa_fhr_image:
+                type: string
+                default: https://customer-fsa-certifacte.png
+              fsa_current_rating_written:
+                type: number
+                default: 4
+              fsa_last_updated_date:
+                type: date
+                default: 2024-04-12
+              fsa_awaiting_inspection_doc:
+                type: string
+                default: https://customer-fsa-certifacte.pdf
+              fsa_scheduled_inspection_date:
+                type: date
+                default: 2024-04-12
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              results:
+                properties:
+                  message: 
+                    type: string
+                    default: FSA information updated!
+
+  /api/merchant/about:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: STORE INFORMATION
+      description: UPDATES MERCHANTS' STORE INFORMATION AND CUSTOMER NOTES
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: request body
+          type: object
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              about:
+                type: string
+                default: This is more information about my store
+              customer_note:
+                type: string
+                default: Information about food elegies to customers
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              results:
+                properties:
+                  message: 
+                    type: string
+                    default: Information updated!
+
+  /api/merchant/stripe/customer:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: STRIPE CUSTOMERS DETAILS
+      description: RETURNS THE MERCHANT'S STRIPE ACCOUNT DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+        
+      responses:
+        200:
+          description: Success
+          
+  /api/merchant/stripe/customer/transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: STRIPE CUSTOMERS' STRIPE INFORMATION
+      description: RETURNS THE MERCHANT'S STRIPE INFORMATION
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/banner/upload:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT STORE BANNER UPLOAD
+      description: ADDS MERCHANT STORE BANNER IMAGE
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: string
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              banner_image:
+                type: string
+                default: https://alphaobjectcontainer.s3.amazonaws.com/z_3UuJZMA-Screencast%20from%2012-05-2022%2010%3A34%3A53%20AM.jpg
+      responses:
+        200:
+          description: Success
+
+  /api/merchant/fhr/image/update:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - MERCHANT
+      summary: MERCHANT STORE BANNER UPLOAD
+      description: ADDS MERCHANT STORE BANNER IMAGE
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: string
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              image:
+                type: string
+                default: https://alphaobjectcontainer.s3.amazonaws.com/z_3UuJZMA-Screencast%20from%2012-05-2022%2010%3A34%3A53%20AM.jpg
+              last_updatedAt:
+                type: date
+                default: 2024-05-5
+      responses:
+        200:
+          description: Success
+
+# FOOD APIs
+  /api/food/create:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: CREATE FOOD API
+      description: CREATES NEW FOOD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestbody
+          type: object
+          schema:
+            $ref: "#/components/schemas/Food"
+      responses:
+        200:
+          description: Success
+
+# FOOD LIST
+  /api/food/all:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD LIST
+      description: RETURNS FOOD LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+# FOOD LIST
+  /api/food/details:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD LIST
+      description: RETURNS FOOD LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success  
+
+# FOOD BY CATEGORY
+  /api/food/by_category:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD LIST BY CATEGORY
+      description: RETURNS FOOD LIST BY CATEGORY
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: restaurant
+          type: string
+        - in: query
+          name: category
+          type: string
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+
+      responses:
+        200:
+          description: Success
+          
+# PUBLISHED FOOD LIST
+  /api/food/published:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: PUBLISHED FOOD LIST
+      description: RETURNS UNPUBLISHED FOOD LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+# UNPUBLISHED FOOD LIST
+  /api/food/unpublished:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD LIST
+      description: RETURNS PUBLISHED FOOD LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+          
+# UNPUBLISHED FOOD LIST
+  /api/food/restaurant/food:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD LIST
+      description: RETURNS FOOD LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+        - in: query
+          name: restaurant
+          type: string
+      responses:
+        200:
+          description: Success
+
+# UPDATE FOOD
+  /api/food/update:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD UPDATE
+      description: UPDATES FOOD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          type: string
+        - in: body
+          name: requestbody
+          type: object
+          schema:
+            $ref: "#/components/schemas/Food"
+      responses:
+        200:
+          description: Success
+          
+
+# FOOD UPDATE API
+  /api/food/publish:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD PUBLISHING
+      description: PUBLISHES FOOD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: authorization
+          type: string
+        - in: body
+          name: requestbody
+          type: object
+          schema:
+            properties:
+              restaurantID:
+                type: string
+                default: 63826b7cb61e8d8fc2a42890
+              foodID:
+                type: string
+                default: 63826b7cb61e8d8fc2a42890,
+              published:
+                type: boolean
+                default: true
+      responses:
+        200:
+          description: Success
+          
+# FOOD DELETE API
+  /api/food/delete:
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD PUBLISHING
+      description: PUBLISHES FOOD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/food/extras:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - FOOD
+      summary: FOOD PROTEINS
+      description: RETURNS FOOD PROTEINS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: food_id
+          type: string
+      responses:
+        200:
+          description: Success
+
+# Cart API documentation
+  /api/cart/add:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - CART
+      summary: ADD TO CART
+      description: ADDS NEW ITEMS TO CART
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestbody
+          schema:
+            $ref: "#/components/schemas/Cart"
+      responses:
+        200:
+          description: Success
+
+  /api/cart/items:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - CART
+      summary: CART ITEM LIST
+      description: RETURNS THE LIST OF ITEMS IN A CART
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: cart_id
+      responses:
+        200:
+          description: Success
+          
+# UPDATE CART ITEM QUANTITY
+  /api/cart/increase_quantity:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - CART
+      summary: UPDATE CART ITEM QUANTITY
+      description: UPDATES ITEM QUANTITY
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              cart_id:
+                type: string
+                default: 67043050970fabe4135ecf96
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              item_id:
+                type: string
+                default: 64a1e1ca85adb80b7024e4cd
+              quantity:
+                type: number
+                default: 3
+      responses:
+        200:
+          description: Success
+    
+# REMOVE CART ITEM
+  /api/cart/remove_item:
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - CART
+      summary: DELETE CART ITEMS
+      description: DELETES ITEMS FROM CART
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: merchant_id
+        - in: query
+          type: string
+          name: cart_id
+        - in: query
+          type: string
+          name: food_id
+      responses:
+        200:
+          description: Success
+
+  /api/cart/add/extra:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - CART
+      summary: ADD EXTRAS
+      description: ADDS NEW EXTRA TO CART
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              cart_id:
+                type: string
+                default: 64d0c61f7f85ffd4d8dea29c
+              food_id:
+                type: string
+                default: 64a1e14b85adb80b7024e4c9
+              extra_id:
+                type: string
+                default: 64a1e2c285adb80b7024e4d3
+      responses:
+        200:
+          description: Success
+
+  /api/cart/remove/extra:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - CART
+      summary: REMOVE EXTRAS
+      description: REMOVES EXTRA TO CART
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              merchant_id:
+                type: string
+                default: 64a1de88d24a4a28a747af3a
+              cart_id:
+                type: string
+                default: 64d0c61f7f85ffd4d8dea29c
+              food_id:
+                type: string
+                default: 64a1e14b85adb80b7024e4c9
+              extra_id:
+                type: string
+                default: 64a1e2c285adb80b7024e4d3
+      responses:
+        200:
+          description: Success
+
+  /api/order/create:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: NEW ORDER
+      description: CREATES NEW ORDER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: body
+          schema:
+            $ref: "#/components/schemas/Order"
+            
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                default: Order created
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              results:
+                properties:
+                  _id:
+                    type: string
+                    default: 63826b7cb61e8d8fc2a42890
+                  name: 
+                    type: string
+                    default: ""
+                  foodPrice: 
+                    type: number
+                    default: 0
+                  extras: 
+                    type: array
+                    default: []
+                  description: 
+                    type: string
+                    default: ""
+                  restaurantId: 
+                    type: string
+                    default: ""
+                  userId: 
+                    type: string
+                    default: ""
+                  totalPrice: 
+                    type: number
+                    default: 0
+                  deliveryFee: 
+                    type: number
+                    default: 0
+                  serviceFee: 
+                    type: number
+                    default: 0
+                  estimatedDeliveryTime: 
+                    type: string
+                    default: 0
+                  foodId:
+                    type: string
+                    default: ""
+                  createdAt:
+                    type: date
+                    default: 2022-11-26T19:39:40.615Z
+                  updatedAt:
+                    type: date
+                    default: 2022-11-26T19:39:40.615Z
+                  _v:
+                    type: number
+                    default: 0
+
+# All order list API
+  /api/order/all:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: Order List
+      description: Returns all order list
+      consumes:
+        - application/json
+      produces:
+        - applicaton/json
+      parameters:
+        - in: query
+          type: number
+          name: page
+        - in: query
+          type: number
+          name: limit
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              results:
+                properties:
+                  schema:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Protein"
+  
+  /api/order/restaurant/orders:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: Order List
+      description: Returns all orders belonging to a restaurant
+      consumes:
+        - application/json
+      produces:
+        - applicaton/json
+      parameters:
+        - in: query
+          type: number
+          name: page
+        - in: query
+          type: number
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              results:
+                properties:
+                  schema:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Protein"
+
+  /api/order/details:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: Order Details
+      description: Returns a single order
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: orderId
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              result: 
+                properties:
+                  _id:
+                    type: string
+                    default: 63826b7cb61e8d8fc2a42890
+                  name: 
+                    type: string
+                    default: ""
+                  foodPrice: 
+                    type: number
+                    default: 0
+                  extras: 
+                    type: array
+                    default: []
+                  description: 
+                    type: string
+                    default: ""
+                  restaurantId: 
+                    type: string
+                    default: ""
+                  userId: 
+                    type: string
+                    default: ""
+                  totalPrice: 
+                    type: number
+                    default: 0
+                  deliveryFee: 
+                    type: number
+                    default: 0
+                  serviceFee: 
+                    type: number
+                    default: 0
+                  estimatedDeliveryTime: 
+                    type: string
+                    default: 0
+                  foodId:
+                    type: string
+                    default: ""
+                  status:
+                    type: string
+                    default: processing
+                  createdAt:
+                    type: date
+                    default: 2022-11-26T19:39:40.615Z
+                  updatedAt:
+                    type: date
+                    default: 2022-11-26T19:39:40.615Z
+                  _v:
+                    type: number
+                    default: 0
+
+  /api/order/status:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ORDER STATUS
+      description: UPDATES ORDER STATUS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              userId:
+                type: string
+                default: 64fc359ab5909f70cfed653a
+              orderId:
+                type: string
+                default: 64fc359ab5909f70cfed653a
+              status:
+                type: string
+                default: accepted
+                enum:
+                  - accepted
+                  - rejected
+                  - processing
+                  - processed
+                  - pickedup
+                  - delivered
+                  - cancelled
+      responses:
+        200:
+          description: Success
+
+  /api/order/rider/delivery:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ORDER STATUS
+      description: PICKUP AND DELIVER ORDERS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: order_id
+          type: string
+        - in: query
+          name: status
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/order/user/orders:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: USER ORDER LIST
+      description: RETURNS ALL ORDERS BELONGING TO A USER
+      consumes:
+        - application/json
+      produces:
+        - applicaton/json
+      parameters:
+        - in: query
+          type: number
+          name: page
+        - in: query
+          type: number
+          name: limit
+        - in: query
+          type: string
+          name: user_id
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              message:
+                type: string
+                default: Success
+              code:
+                type: number
+                default: 200
+              error:
+                type: boolean
+                default: false
+              results:
+                properties:
+                  schema:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Protein"
+
+  /api/order/new/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MERCHANTS' NEW ORDER LIST
+      description: RETURNS MERCHANT NEW ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+      responses:
+        200:
+          description: Success
+
+  /api/order/admin/new:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: NEW ORDER LIST
+      description: RETURNS ALL NEW ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+      responses:
+        200:
+          description: Success
+
+  /api/order/accepted/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MERCHANTS' ACCEPTED ORDER LIST
+      description: RETURNS MERCHANT ACCEPTED ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+      responses:
+        200:
+          description: Success
+
+  /api/order/admin/latest:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: LATEST ORDERS
+      description: RETURNS LIST OF LATEST ORDERS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+      responses:
+        200:
+          description: Success
+
+  /api/order/rejected/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MERCHANTS' REJECTED ORDER LIST
+      description: RETURNS MERCHANT REJECTED ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+      responses:
+        200:
+          description: Success
+
+  /api/order/user/rejected/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: USER'S REJECTED ORDER LIST
+      description: RETURNS A USER'S REJECTED ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: userId
+      responses:
+        200:
+          description: Success
+
+  /api/order/processing/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MERCHANTS' PROCESSING ORDER LIST
+      description: RETURNS MERCHANT PROCESSING ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+      responses:
+        200:
+          description: Success
+
+  /api/order/user/processing/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: USER'S PROCESSING ORDER LIST
+      description: RETURNS A USER'S PROCESSING ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: userId
+      responses:
+        200:
+          description: Success
+
+  /api/order/processed/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MERCHANT'S PROCESSED ORDER LIST
+      description: RETURNS A MERCHANT'S PROCESSED ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+      responses:
+        200:
+          description: Success
+
+  /api/order/user/processed/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: USER'S PROCESSED ORDER LIST
+      description: RETURNS A USER'S PROCESSED ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: userId
+      responses:
+        200:
+          description: Success
+
+  /api/order/pickedup/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MERCHANT'S PICKEDUP ORDER LIST
+      description: RETURNS A MERCHANT'S PICKEDUP ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+      responses:
+        200:
+          description: Success
+
+  /api/order/user/pickedup/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: USER'S PICKEDUP ORDER LIST
+      description: RETURNS A USER'S PICKEDUP ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: userId
+      responses:
+        200:
+          description: Success
+
+  /api/order/delivered/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MERCHANT'S DELIVERED ORDER LIST
+      description: RETURNS A MERCHANT'S DELIVERED ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: userId
+      responses:
+        200:
+          description: Success
+
+  /api/order/user/delivered/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: USER'S DELIVERED ORDER LIST
+      description: RETURNS A USER'S DELIVERED ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: userId
+      responses:
+        200:
+          description: Success
+
+  /api/order/overview:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: OVERVIEW
+      description: RETURNS OVERVIEW OF A MERCHANT'S ORDER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: start_date
+          default: 2023-08-01
+        - in: query
+          type: string
+          name: end_date
+          default: 2023-09-12
+      responses:
+        200:
+          description: Success
+
+  /api/order/list/status:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ORDERS BY STATUS
+      description: RETURNS A MERCHANT'S ORDER LIST BY STATUS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: page
+        - in: query
+          type: string
+          name: limit
+        - in: query
+          type: string
+          name: restaurantId
+          default: 64a1de88d24a4a28a747af3a
+        - in: query
+          type: string
+          name: status
+          default: delivered
+      responses:
+        200:
+          description: Success
+
+  /api/order/cancel:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: CANCEL
+      description: CANCELS AN ORDER REQUEST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              user_id:
+                type: string
+                default: 64a1dbe3d24a4a28a747af29
+              order_id:
+                type: string
+                default: 64fc359ab5909f70cfed653a
+      responses:
+        200:
+          description: Success
+
+  /api/order/dashboard/overview:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: DASHBOARD OVERVIEW
+      description: RETURNS A MERCHANT'S ORDER DASHBOARD OVERVIEW
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+      responses:  
+        200:
+          description: Success
+
+  /api/order/analysis:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ORDER STATISTICS
+      description: RETURNS A MERCHANT'S ORDER ANALYTIC GRAPH DATA
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+        - in: query
+          name: date_filter
+          type: string
+          enum:
+            - last 7 days
+            - last month
+            - 2023/09/01
+            - last year
+      responses:  
+        200:
+          description: Success
+  
+  /api/order/list/latest:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ORDER STATISTICS
+      description: RETURNS A MERCHANT'S ORDER ANALYTIC GRAPH DATA
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+        - in: query
+          name: page
+          type: string
+          default: 1
+        - in: query
+          name: limit
+          type: string
+          default: 20  
+      responses:  
+        200:
+          description: Success
+
+  /api/order/merchant/revenue:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ORDER STATISTICS
+      description: RETURNS A MERCHANT'S ORDER ANALYTIC GRAPH DATA
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string 
+      responses:  
+        200:
+          description: Success
+
+  /api/order/admin/overview:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ADMIN ORDER OVERVIEW
+      description: RETURNS ADMIN ORDER OVERVIEW
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: date_filter
+          type: string
+          enum:
+            - today
+            - last 7d
+            - last 30d
+            - 2023/09/01
+      responses:
+        200:
+          description: Success
+  
+  /api/order/search:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: SEARCH
+      description: SEARCHES AND RETURNS ORDER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: searchTerm
+          type: string
+        - in: query
+          name: merchant_id
+          type: string
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/order/dashboard/monthly/earnings:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: MONTHLY EARNINGS
+      description: RETURNS MONTHLY TRANSACTIONS ON Sales app
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+      responses:
+        200:
+          description: Success
+
+  /api/order/top_selling:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: TOP SELLING
+      description: RETURNS TOP SELLING CATEGORIES LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+      responses:
+        200:
+          description: Success  
+
+  /api/order/admin/order_by_status:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ORDER
+      summary: ORDER LIST BY STATUS
+      description: RETURNS ORDER LIST BY STATUS FOR ADMIN DASHBOARD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: number
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: status
+          type: string
+      responses:
+        200:
+          description: Success 
+
+# USER APIs
+  /api/users/social_auth:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: CREATE/LOGIN
+      description: CREATES AND LOGIN USERS USING SOCIAL AUTHENTICATION
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            properties:
+              full_name: 
+                type: string
+                default: John Doe 
+              email: 
+                type: string
+                default: email@domain.com
+              phone: 
+                type: string
+                default: "+447789333435"
+              picture: 
+                type: string
+                default: https://userimage.png
+              firebase_token:
+                type: string
+                default: 24rdjdlkrwui4peorlwkdewirekfjs43ik
+              login_type:
+                type: string
+                enum:
+                  - google_auth
+                  - apple_auth
+                  - email_auth
+      responses:
+        200:
+          description: Success
+
+  /api/users/email_signup:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: CREATE
+      description: CREATES USERS USING EMAIL ADDRESS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            properties:
+              full_name:
+                type: string
+                default: John Doe
+                required: true
+              email:
+                type: string
+                default: doe@gmail.com
+                required: true
+              password: 
+                type: string
+                default: password123@P
+                required: true
+              phone:
+                type: string
+                default: "+447760846732"
+                required: true
+              picture:
+                type: string
+                default: "" 
+      responses:
+        200:
+          description: Success
+
+  /api/users/verify:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: PHONE VERIFICATION
+      description: VERIFIES OTP SENT TO USER PHONE NUMBER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            properties:
+              code:
+                type: string
+                default: 123456
+                required: true
+      responses:
+        200:
+          description: Success
+
+  /api/users/otp/resend:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: RESEND CODE
+      description: RESENDS VERIFICATION CODE TO USER PHONE NUMBER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            properties:
+              phone:
+                type: string
+                default: +447760806772
+                required: true
+      responses:
+        200:
+          description: Success
+
+
+  /api/users/email_login:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: LOGIN
+      description: CREATES USERS USING EMAIL ADDRESS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            properties: 
+              email:
+                type: string
+                default: username@domain.com
+                require: true
+              password: 
+                type: string
+                default: password123@P
+              login_type:
+                type: string
+                default: email_auth
+                enum:
+                  - apple_auth
+                  - email_auth
+                  - google_auth
+      responses:
+        200:
+          description: Success
+
+  /api/users/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: USERS
+      description: RETURNS USER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: number
+        - in: query
+          name: limit
+          type: number
+      responses:
+        200:
+          description: Success
+
+  /api/users/details:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: USERS
+      description: RETURNS USER ACCOUNT DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/users/update:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: USERS
+      description: UPDATES USER ACCOUNT DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            $ref: "#/components/schemas/User"
+      responses:
+        200:
+          description: Success
+
+  /api/users/delete:
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: USERS
+      description: DELETES USER ACCOUNT DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/users/create/stripe:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: STRIPE ID
+      description: ADDS STRIPE ID TO USER DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            properties:
+              id:
+                type: string
+                default: 64c8cb3f173ceec28bdb0452
+                required: true
+              stripe_id:
+                type: string
+                default: pi_3NjcaCABr7WbE6J01XY7v8Ts
+                required: true
+      responses:
+        200:
+          description: Success
+
+  /api/users/address/new:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: ADDRESS
+      description: CREATES USERS ADDRESS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          type: object
+          schema:
+            properties:
+              first_line:
+                type: string
+                default: 23 Ethelbert Rd
+              city:
+                type: string
+                default: SW20
+              post_code:
+                type: string
+                default: 8QD 
+              country:
+                type: string
+                default: London
+                required: true
+              user_id:
+                type: string
+                default: 64a1dbe3d24a4a28a747af29
+      responses:
+        200:
+          description: Success
+
+  /api/users/address:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: ADDRESS
+      description: CREATES USERS ADDRESS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: user_id
+      responses:
+        200:
+          description: Success
+
+  /api/users/update/device_token:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: DEVICE TOKEN
+      description: UPDATES MERCHANTS' DEVICE TOKEN
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestbody
+          schema:
+            properties:
+              user_id:
+                type: string
+                default: 64a1dbe3d24a4a28a747af29
+              device_token:
+                type: string
+                default: APA91bFoi3lMMre9G3XzR1LrF4ZT82_15MsMdEICogXSLB8-MrdkRuRQFwNI5u8Dh0cI90ABD3BOKnxkEla8cGdisbDHl5cVIkZah5QUhSAxzx4Roa7b4xy9tvx9iNSYw-eXBYYd8k1XKf8Q_Qq1X9-x-U-Y79vdPq
+      responses:
+        200:
+          description: Success
+
+  /api/users/dashboard/customers:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: DASHBOARD CUSTOMER LIST
+      description: UPDATES MERCHANTS' DEVICE TOKEN
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: date_filter
+          type: string
+          enum:
+            - all
+            - today
+            - last 7days
+            - last 30days
+            - 2023-08-12
+      responses:
+        200:
+          description: Success
+
+  /api/users/dashboard/search:
+    get: 
+      security:
+        - Bearer: [] 
+      tags:
+        - USERS
+      summary: DASHBOARD CUSTOMER SEARCH
+      description: UPDATES MERCHANTS' DEVICE TOKEN
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+        - in: query
+          name: search_term
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/users/dashboard/customer/details:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: DASHBOARD CUSTOMER DETAILS
+      description: RETURNS USER ACCOUNT DETAILS FOR ADMIN DASHBOARD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: user_id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/users/dashboard/customer/recent/orders:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: DASHBOARD CUSTOMER RECENT ORDERS
+      description: RETURNS LIST OF CUSTOMER'S RECENT ORDERS FOR ADMIN DASHBOARD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: user_id
+          type: string
+        - in: header
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/users/dashboard/customer/recent/transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: DASHBOARD CUSTOMER RECENT TRANSACTIONS
+      description: RETURNS LIST OF CUSTOMER'S RECENT TRANSACTIONS FOR ADMIN DASHBOARD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: user_id
+          type: string
+        - in: header
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/users/verify/email:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: DASHBOARD CUSTOMER RECENT TRANSACTIONS
+      description: RETURNS LIST OF CUSTOMER'S RECENT TRANSACTIONS FOR ADMIN DASHBOARD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              email:
+                type: string
+                default: doe@domain.com
+      responses:
+        200:
+          description: Success
+
+  /api/users/stripe/customer:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - USERS
+      summary: STRIPE CUSTOMER DETAILS
+      description: RETURNS THE USER'S STRIPE INFORMATION
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: user_id
+          type: string
+      responses:
+        200:
+          description: Success
+   
+  /api/role/create:
+    post: 
+      security:
+        - Bearer: []
+      tags:
+        - ROLE
+      summary: CREATE
+      description: CREATES NEW ROLE
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body  
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              name: 
+                type: string
+                default: user
+      responses:
+        200:
+          description: Success
+
+  /api/role/all:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ROLE
+      summary: LIST
+      description: FETCHE ALL ROLE LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/role/details:
+    get:  
+      security:
+        - Bearer: []
+      tags:
+        - ROLE
+      summary: DETAILS
+      description: FETCHES SINGLE ROLE DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/role/update:
+    put: 
+      security:
+        - Bearer: []
+      tags:
+        - ROLE
+      summary: UPDATE
+      description: UPDATES ROLE
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body  
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              name: 
+                type: string
+                default: user
+              id: 
+                type: string
+                default: 647e45f3d7d5aaead783d426
+      responses:
+        200:
+          description: Success
+
+  /api/role/delete:
+    delete:  
+      security:
+        - Bearer: []
+      tags:
+        - ROLE
+      summary: DELETE
+      description: DELETE SINGLE ROLE DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/role/add/permission:
+    put:  
+      security:
+        - Bearer: []
+      tags:
+        - ROLE
+      summary: ADD PERMISSION
+      description: ADD PERMISSIONS TO A PARTICULAR ROLE
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              role_id:
+                type: string
+                default: 64a1daccafb1f21ba56a6770
+              permissions:
+                type: array
+                default: [653ec6306e2208668b7ed8a9]
+      responses:
+        200:
+          description: Success
+ 
+  /api/permission/create:
+    post:
+      security:
+        - Bearer: []
+      tags: 
+        - PERMISSION
+      summary: NEW PERMISSION
+      description: CREATES A NEW PERMISSION
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              name:
+                type: string
+                default: Allow users view account
+                required: true
+      responses:
+        200:
+          description: Success
+
+  /api/permission/update:
+    put:
+      security:
+        - Bearer: []
+      tags: 
+        - PERMISSION
+      summary: PERMISSION UPDATE
+      description: UPDATES A PERMISSION DETAILS
+      parameters:
+        - in: body
+          name: requestBody
+          type: object
+          schema:
+            properties:
+              name:
+                type: string
+                default: readAny
+                required: true
+              id: 
+                type: string
+                default: 64a1dcffd24a4a28a747af2d
+                required: true
+      responses:
+        200:
+          description: Success
+
+  /api/permission/admin/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - PERMISSION
+      summary: PERMISSION LIST
+      description: RETURNS PERMISSION LIST FOR ADMIN VIEW
+      parameters:
+        - in: query
+          name: page
+          type: string
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/permission/delete:
+    delete:
+      security:
+        - Bearer: []
+      tags: 
+        - PERMISSION
+      summary: DELETE
+      description: DELETES A PERMISSION DETAILS
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/permission/details:
+    get:
+      security:
+        - Bearer: []
+      tags: 
+        - PERMISSION
+      summary: PERMISSION DETAILS
+      description: RETURNS PERMISSION DETAILS
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/permission/search:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - PERMISSION
+      summary: SEARCH
+      description: SEARCH PERMISSIONS WITH PERMISSION NAME
+      parameters:
+        - in: query
+          name: search_term
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/notification/list:
+    get: 
+      security:
+        - Bearer: [] 
+      tags:
+        - NOTIFICATION
+      summary: NOTIFICATION LIST
+      description: RETURNS LIST OF NOTIFICATION
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchant_id
+          type: string
+        - in: query
+          type: string
+          name: page
+        - in: query
+          name: limit
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/notification/delete:
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - NOTIFICATION
+      summary: DELETE NOTIFICATION
+      description: DELETES A NOTIFICATION RECORD
+      parameters:
+        - in: query
+          name: id
+          type: string
+      responses:
+        200:
+          description: Success
+
+  /api/notification/update:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - NOTIFICATION
+      summary:  NOTIFICATION STATUS UPDATE
+      description: UPDATES NOTIFICATION STATUS TO OPENED
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: id
+      responses:
+        200:
+          description: Success
+
+  /api/notification/subscribe-to-topic:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - NOTIFICATION
+      summary:  SUBSCRIBE TO TOPIC
+      description: SUBSCRIBE USERS TO TOPIC
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              topic:
+                type: string
+                default: message-topic
+              image:
+                type: string
+                default: https://example-image.png
+              icon:
+                type: string
+                default: https://example-icon.png
+              tokens:
+                type: array
+                default: [ fsu8G8VFv0vFsIW6hu3DAl:APA91bH9GiY7tIYWv0-Vf9qtwDMVpXHjJ6jcuxokmh3hOLhybKQ5dTEwAQfh87AR1eP4n-tJ-5nesFHLcMt-9OXgQSb1ouIAPhGB7kh37NMTPJjzBLa5lf_Lf-rX1eSi9P3tzdkLGKHX ]
+      responses:
+        200:
+          description: Success
+
+  /api/notification/send-message-to-topic:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - NOTIFICATION
+      summary:  SEND MESSAGE
+      description: SEND MESSAGE TO SUBSCRIBED USER
+      consumes: 
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              topic:
+                type: string
+                default: "message-topic"
+              title:
+                type: string
+                default: Sweet in-app message
+              image:
+                type: string
+                default: https://example-image.png
+              icon:
+                type: string
+                default: https://example-icon.png
+              message:
+                type: string
+                default: "Example in-app message"
+              tokens:
+                type: array
+                default: []
+      responses:
+        200:
+          description: Success
+
+# DISCOUNT APIs
+  /api/discount/create:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - DISCOUNT
+      summary: NEW DISCOUNT OFFER
+      description: CREATES NEW DISCOUNT OFFER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              percentage:
+                type: number
+                default: 10
+                required: false
+              amount:
+                type: number
+                default: 20
+                required: false
+              discountType:
+                type: string
+                default: percentage
+                required: true
+              city:  
+                type: string
+                default: Ply Mouth
+                required: false
+              code:
+                type: string
+                default: birmingham101
+              name:
+                type: string
+                default: valentine
+                required: false
+              isGeneral:
+                type: boolean
+                default: false
+                required: true
+              usage:
+                type: string
+                default: single
+                required: true
+                enum: 
+                  - single
+                  - multiple
+              expiryDate:
+                type: date
+                default: 2024-10-19
+                required: true
+      responses:
+        200:
+          description: success
+  
+  /api/discount/update:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - DISCOUNT
+      summary: UPDATE DISCOUNT OFFER
+      description: UPDATES DISCOUNT OFFER DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          type: object
+          name: requestBody
+          schema:
+            properties:
+              id:
+                type: string
+                default: 65d09150e4a8f28002902e17
+                required: true
+              percentage:
+                type: number
+                default: 10
+                required: true
+              amount:
+                type: number
+                default: 20
+                required: false
+              discountType:
+                type: string
+                default: percentage
+              city:  
+                type: string
+                default: Ply Mouth
+                required: false
+              code:
+                type: string
+                default: birmingham101
+              name:
+                type: string
+                default: valentine
+                required: false
+              isGeneral:
+                type: boolean
+                default: false
+                required: true
+              usage:
+                type: string
+                default: single
+                required: true
+                enum: 
+                  - single
+                  - multiple
+              expiryDate:
+                type: date
+                default: 2024-10-19
+                required: true
+      responses:
+        200:
+          description: success
+
+  /api/discount/list:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - DISCOUNT
+      summary: DISCOUNT OFFER LIST
+      description: RETURNS DISCOUNT OFFER LIST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+
+  /api/discount/details:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - DISCOUNT
+      summary: DISCOUNT OFFER DETAILS
+      description: RETURNS DISCOUNT OFFER DETAILS
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: id
+      responses:
+        200:
+          description: success
+  
+  /api/discount/delete:
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - DISCOUNT
+      summary: DELETE
+      description: DELETES DISCOUNT OFFER
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: id
+      responses:
+        200:
+          description: success
+
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        merchant:
+          type: string
+          default: 647e45f3d7d5aaead783d426
+    Merchant:
+      type: object
+      properties:
+        first_name:
+          type: string
+          default: John
+        last_name:
+          type: string
+          default: Doe
+        email:
+          type: string
+          default: jondoe@domain.com
+        phone_number: 
+          type: string
+          default: "+2348012345678"
+        image_url:
+          type: string
+          default: https://sales-app-s3-bucket.s3.amazonaws.com/pPnYkV8C_-pexels-chan-walrus-958545.jpg
+        merchant_type:
+          type: string
+          default: 647e3dea024e3706767500c4
+        password:
+          type: string
+          default: johndoe123
+        restuarant_name: 
+          type: string
+          default: Nsala Kitchen
+        line_1: 
+          type: string
+          default: 1, Chris Ben lane
+        line_2: 
+          type: string
+          default: 2 Chris Ben lane
+        city: 
+          type: string
+          default: chicago
+        post_code:
+          type: string
+          default: 1000781
+        country: 
+          type: string
+          default: United Kingdom
+        id:
+          type: string
+          default: 6467334359210d49f3a69b70
+          require: false
+        latitude:
+          type: number
+          default: 6.471020
+        longitude:
+          type: number
+          default: 3.635580
+    Protein:
+      type: object
+      properties:
+        _id: 
+          type: string
+          default: 63826b7cb61e8d8fc2a42890
+        name:
+          type: string
+          default: Obokun fish
+        price:
+          type: number
+          default: 2.5
+        restaurant:
+          type: string
+          default: 63826b7cb61e8d8fc2a42890
+        createdAt:
+          type: date
+          default: 2022-11-26T19:39:40.615Z
+        updatedAt:
+          type: date
+          default: 2022-11-26T19:39:40.615Z
+        _v:
+          type: number
+          default: 0
+    ExtraCategory:
+      type: object
+      properties:
+        categoryName:
+          type: string
+        description:
+          type: string
+        restaurant:
+          type: string
+          default: 647e45f3d7d5aaead783d426
+    Extra:
+      type: object
+      properties:
+        restaurant:
+          type: string
+          default: 647e45f3d7d5aaead783d426
+        category:
+          type: string
+          default: 647e45f3d7d5aaead783d426
+        extraName:
+          type: string
+          default: cat fish
+        price:
+          type: number
+          default: 2.3
+        published:
+          type: boolean
+          default: true
+    MerchantType:
+      type: object
+      properties:
+        name:
+          type: string
+          default: Restaurants
+        image_url:
+          type: string
+          default: ""
+    Order:
+      type: object
+      properties:
+        promo_code:
+          type: string
+          default: birmingham101
+        cart_id:
+          type: string
+          default: 64bb78364d6bb0d64fea4252
+        userId: 
+          type: string
+          default: 64a1dbe3d24a4a28a747af29
+        items: 
+          type: array
+        deliveryFee: 
+          type: number
+          default: 8.2
+        serviceFee: 
+          type: number
+          default: 1.98
+        estimatedDeliveryTime: 
+          type: number
+          defult: 60
+        payment_token: 
+          type: string
+          default: pi_3NgabtABr7WbE6J01J0ktNyE
+        subtotal:
+          type: number
+          default: 4.34
+        grandTotal:
+          type: number
+          default: 20.98
+        note: 
+          type: string
+          default: Do not add too much salt
+        email:
+          type: string
+          default: doe@domain.com
+        device_id:
+          type: string
+          default: 2iew23048kw832odi232pd
+        actual_cost:
+          type: number
+          default: 15.10
+        lat:
+          type: number
+          default: 3.834503
+        long:
+          type: number
+          default: 0.244353
+        delivery_address:
+          type: string
+          default: 44 Billington Close, PL6 5SY UK
+    Food:
+      type: object
+      properties:
+        name: 
+          type: string
+          default: ""
+        image_url: 
+          type: string
+          default: ""
+        description: 
+          type: string
+          default: ""
+        price: 
+          type: number
+          default: 2.3
+        extras:
+          type: array
+          default: ["64a1e2a885adb80b7024e4d0"]
+        extras_by_category:
+          type: array
+          default: ["75a1e2a885adb80b7024e4e1"]
+        category:  
+          type: string
+          default: 647e4a4659147721b11300ab
+        restaurant: 
+          type: string
+          default: ""
+        estimatedPrepTime: 
+          type: string
+          default: 24mins
+        taxRate: 
+          type: string
+          default: 2.5%
+        published:
+          type: boolean
+          default: false
+        unit:
+          type: string
+          default: per plate
+          enum:
+            - per kg
+            - per unit
+            - none
+            - per plate
+    Cart:
+      type: object
+      properties:
+        cart_id:
+          type: string
+          default: 64a1de88d24a4a28a747af3a
+          optional: true
+        merchant_id:
+          type: string
+          default: 64a1de88d24a4a28a747af3a
+        food_id:
+          type: string
+          default: 64a1e14b85adb80b7024e4c9
+        quantity: 
+          type: number
+          default: 1
+        extras: 
+          type: array
+          default: ["64a1e2a885adb80b7024e4d0"]
+        note:
+          type: string
+          default: add a little quantity of salt
+    Logistic:
+      type: object
+      properties:
+        cart_id: 
+          type: string
+          required: true
+          default: 66ac2ad6b0cac9a2de294541
+        user_address:
+          type: string
+          default: 112 Cornwall Street, Plymouth, UK
+        email:
+          type: string
+          default: doe@domain.com
+        device_id:
+          type: string
+          default: 2iew23048kw832odi232pd
+        distance:
+          type: number
+          default: 3.3
+        promo_code:
+          type: string
+          default: birmingham101
+    User:
+      type: object
+      properties:
+        address:
+          type: string
+          default: 12, bean street boomboom
+          optional: true
+        full_name:
+          type: string
+          require: true
+        email:
+          type: string
+          require: true
+        phone:
+          type: string
+          default: "+4453448390"
+        role:
+          type: string
+          default: 649f2a9bc4c99b06bcbffbeb
+        picture: 
+          type: string
+          default:  https://alphaobjectcontainer.s3.amazonaws.com/z_3UuJZMA-Screencast%20from%2012-05-2022%2010%3A34%3A53%20AM.jpg
+
+      
+  #       "orderId": "",
+  # "restaurantId": "",
+  # "status": "accepted"
